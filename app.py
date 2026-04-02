@@ -125,28 +125,28 @@ st.markdown(
         }
 
         .stApp {
-            background:
-                radial-gradient(circle at top, #161616 0%, #080808 38%, #000000 100%);
+            background: radial-gradient(circle at top, #161616 0%, #080808 38%, #000000 100%);
             color: var(--text);
         }
 
         .block-container {
             max-width: 1120px;
             margin: 0 auto;
-            padding-top: 0.8rem;
+            padding-top: 0.4rem;
             padding-bottom: 2rem;
         }
 
         header {visibility: hidden;}
 
         .hero-shell {
-            min-height: 74vh;
+            min-height: 54vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            text-align: center;
+            text-align: left;
             flex-direction: column;
-            padding: 1rem 0 2rem 0;
+            padding-top: 4.75rem;
+            padding-bottom: 1.25rem;
         }
 
         .eyebrow {
@@ -154,77 +154,45 @@ st.markdown(
             font-size: 0.74rem;
             letter-spacing: 0.30em;
             text-transform: uppercase;
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.8rem;
         }
 
         .hero-title {
             color: #ffffff;
-            font-size: 4.6rem;
+            font-size: 4.35rem;
             font-weight: 800;
-            letter-spacing: 0.14em;
-            line-height: 1;
-            margin-bottom: 0.85rem;
+            letter-spacing: 0.12em;
+            line-height: 0.95;
+            margin-bottom: 0.9rem;
             text-transform: uppercase;
         }
 
         .hero-subtitle {
             color: #a1a1a6;
-            font-size: 1rem;
+            font-size: 0.98rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            margin-bottom: 1.15rem;
+            margin-bottom: 1rem;
         }
 
         .hero-copy {
-            max-width: 680px;
+            max-width: 620px;
             color: #b0b0b6;
             font-size: 1.02rem;
             line-height: 1.7;
-            margin-bottom: 1.6rem;
+            margin-bottom: 1.5rem;
         }
 
         .template-bar {
             width: 100%;
             max-width: 420px;
-            margin: 0 auto 1.4rem auto;
+            margin-bottom: 1.05rem;
         }
 
-        .action-card {
-            background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-            border: 1px solid rgba(255,255,255,.08);
-            border-radius: 24px;
-            padding: 1.4rem;
-            min-height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform .15s ease, border-color .15s ease, background .15s ease;
-        }
-
-        .action-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,.14);
-            background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-        }
-
-        .action-title {
-            color: #ffffff;
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.55rem;
-        }
-
-        .action-copy {
-            color: #9d9da2;
-            font-size: 0.93rem;
-            line-height: 1.62;
-        }
-
-        .mini-label {
-            color: #6f6f74;
-            font-size: 0.75rem;
-            letter-spacing: 0.10em;
-            text-transform: uppercase;
+        .workflow-shell {
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 0.2rem;
         }
 
         .workspace-shell {
@@ -232,10 +200,20 @@ st.markdown(
             border: 1px solid rgba(255,255,255,.06);
             border-radius: 28px;
             padding: 1.1rem;
-            box-shadow:
-                0 18px 48px rgba(0,0,0,.28),
-                inset 0 1px 0 rgba(255,255,255,.02);
+            box-shadow: 0 18px 48px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.02);
             margin-top: 0.4rem;
+            animation: fadeRise .45s ease;
+        }
+
+        @keyframes fadeRise {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .workspace-title {
@@ -266,17 +244,6 @@ st.markdown(
             padding: 1rem;
         }
 
-        .note {
-            color: #8f8f94;
-            font-size: 0.86rem;
-            line-height: 1.58;
-            background: rgba(255,255,255,.02);
-            border: 1px solid rgba(255,255,255,.05);
-            border-radius: 16px;
-            padding: 0.86rem 0.95rem;
-            margin: 0.55rem 0 0.9rem 0;
-        }
-
         .success-box {
             background: linear-gradient(180deg, rgba(17,38,22,.95), rgba(11,24,14,.95));
             border: 1px solid rgba(110,225,140,.24);
@@ -301,23 +268,6 @@ st.markdown(
             margin-bottom: 0.7rem;
         }
 
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 0.45rem;
-            margin-bottom: 0.4rem;
-        }
-
-        .stTabs [data-baseweb="tab"] {
-            background: rgba(255,255,255,.02);
-            border: 1px solid rgba(255,255,255,.06);
-            border-radius: 14px;
-            padding: 0.60rem 0.95rem;
-        }
-
-        .stTabs [aria-selected="true"] {
-            background: rgba(255,255,255,.05) !important;
-            border-color: rgba(255,255,255,.12) !important;
-        }
-
         .stButton > button {
             width: 100% !important;
             border-radius: 16px !important;
@@ -328,9 +278,7 @@ st.markdown(
             font-size: 0.98rem !important;
             letter-spacing: 0.02em !important;
             padding: 1rem 1rem !important;
-            box-shadow:
-                0 10px 24px rgba(255,255,255,.04),
-                inset 0 1px 0 rgba(255,255,255,.55) !important;
+            box-shadow: 0 10px 24px rgba(255,255,255,.04), inset 0 1px 0 rgba(255,255,255,.55) !important;
         }
 
         .stDownloadButton > button {
@@ -362,8 +310,34 @@ st.markdown(
             border: 1px solid rgba(255,255,255,.07) !important;
         }
 
-        h1, h2, h3 {
-            margin-bottom: 0.45rem !important;
+        /* Apple-like segmented control */
+        div[data-testid="stRadio"] > div {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 18px;
+            padding: 0.32rem;
+            width: 100%;
+        }
+
+        div[data-testid="stRadio"] label {
+            background: transparent !important;
+            border-radius: 14px !important;
+            padding: 0.72rem 1.05rem !important;
+            border: none !important;
+        }
+
+        div[data-testid="stRadio"] label p {
+            color: #c7c7cc !important;
+            font-weight: 600 !important;
+        }
+
+        div[data-testid="stRadio"] label:has(input:checked) {
+            background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06)) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        }
+
+        div[data-testid="stRadio"] label:has(input:checked) p {
+            color: #ffffff !important;
         }
 
         .divider-space {
@@ -607,7 +581,7 @@ if "selected_template" not in st.session_state:
     st.session_state["selected_template"] = TEMPLATE_OPTIONS[0]
 
 if "active_mode" not in st.session_state:
-    st.session_state["active_mode"] = None
+    st.session_state["active_mode"] = "Migrate Policy"
 
 
 # ============================================================================
@@ -617,13 +591,7 @@ st.markdown('<div class="hero-shell">', unsafe_allow_html=True)
 st.markdown('<div class="eyebrow">Takeoff Product</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-title">MIDNIGHT</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-subtitle">Policy Migration Engine</div>', unsafe_allow_html=True)
-
-st.markdown(
-    '<div class="hero-copy">'
-    'Standardize policy workflows.'
-    '</div>',
-    unsafe_allow_html=True,
-)
+st.markdown('<div class="hero-copy">Standardize policy workflows.</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="template-bar">', unsafe_allow_html=True)
 selected_template = st.selectbox(
@@ -636,296 +604,295 @@ selected_template = st.selectbox(
 st.session_state["selected_template"] = selected_template
 st.markdown("</div>", unsafe_allow_html=True)
 
-cta1, cta2 = st.columns(2)
-
-with cta1:
-    if st.button("Migrate Policy", key="hero_migrate"):
-        st.session_state["active_mode"] = "migrate"
-
-with cta2:
-    if st.button("Create Policy", key="hero_create"):
-        st.session_state["active_mode"] = "create"
-
+st.markdown('<div class="workflow-shell">', unsafe_allow_html=True)
+mode = st.radio(
+    "Workflow",
+    ["Migrate Policy", "Create Policy"],
+    horizontal=True,
+    label_visibility="collapsed",
+    index=0 if st.session_state["active_mode"] == "Migrate Policy" else 1,
+)
+st.session_state["active_mode"] = mode
+st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================================
 # WORKSPACE
 # ============================================================================
-if st.session_state["active_mode"] is not None:
-    st.markdown('<div class="workspace-shell">', unsafe_allow_html=True)
+st.markdown('<div class="workspace-shell">', unsafe_allow_html=True)
 
-    if st.session_state["active_mode"] == "migrate":
-        st.markdown('<div class="workspace-title">Migrate Policy</div>', unsafe_allow_html=True)
+if st.session_state["active_mode"] == "Migrate Policy":
+    st.markdown('<div class="workspace-title">Migrate Policy</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="workspace-subtitle">Target template: {st.session_state["selected_template"]}</div>',
+        unsafe_allow_html=True,
+    )
+
+    left, right = st.columns([1.08, 1])
+
+    with left:
+        st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+        st.markdown("### Upload")
         st.markdown(
-            f'<div class="workspace-subtitle">Target template: {st.session_state["selected_template"]}</div>',
+            '<div class="caption-text">Supported formats: .docx, .txt, .md</div>',
             unsafe_allow_html=True,
         )
 
-        left, right = st.columns([1.08, 1])
+        migrate_template = st.selectbox(
+            "Migrate Template",
+            TEMPLATE_OPTIONS,
+            index=TEMPLATE_OPTIONS.index(st.session_state["selected_template"]),
+            key="migrate_template_selector",
+        )
+        st.session_state["selected_template"] = migrate_template
 
-        with left:
-            st.markdown('<div class="panel-card">', unsafe_allow_html=True)
-            st.markdown("### Upload")
-            st.markdown(
-                '<div class="caption-text">Supported formats: .docx, .txt, .md</div>',
-                unsafe_allow_html=True,
+        uploaded_file = st.file_uploader(
+            "Upload a legacy policy document",
+            type=["docx", "txt", "md"],
+            label_visibility="collapsed",
+            key="migrate_upload",
+        )
+
+        run_migration = st.button("Transform Policy", key="run_migration")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with right:
+        st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+        st.markdown("### Preview")
+        if "migration_policy_data" in st.session_state:
+            render_policy_preview(st.session_state["migration_policy_data"])
+        else:
+            st.info("Run a migration to preview the extracted policy before generating the final document.")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    if run_migration:
+        api_key = get_api_key()
+
+        if not api_key:
+            st.error("No Groq API key found. Set GROQ_API_KEY in Streamlit secrets or use the local fallback for testing.")
+            st.stop()
+
+        if not uploaded_file:
+            st.error("Please upload a legacy policy document.")
+            st.stop()
+
+        doc_text = get_uploaded_text(uploaded_file)
+
+        if len(doc_text.strip()) < 50:
+            st.error("Document appears to be empty or too short.")
+            st.stop()
+
+        progress = st.progress(0)
+        status = st.empty()
+
+        try:
+            status.markdown('<div class="status-text">Reading document…</div>', unsafe_allow_html=True)
+            progress.progress(15)
+
+            client = Groq(api_key=api_key)
+
+            status.markdown('<div class="status-text">Extracting policy structure…</div>', unsafe_allow_html=True)
+            progress.progress(35)
+
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": EXTRACTION_PROMPT + "\n\n" + doc_text,
+                    }
+                ],
+                temperature=0.1,
+                max_tokens=8000,
             )
 
-            migrate_template = st.selectbox(
-                "Migrate Template",
+            raw_output = response.choices[0].message.content.strip()
+
+            status.markdown('<div class="status-text">Parsing extracted data…</div>', unsafe_allow_html=True)
+            progress.progress(60)
+
+            policy_data = parse_policy_data(raw_output)
+
+            if not policy_data:
+                st.error("The model response could not be parsed into POLICY_DATA.")
+                with st.expander("Raw model output"):
+                    st.code(raw_output)
+                st.stop()
+
+            policy_data["template_name"] = st.session_state["selected_template"]
+            st.session_state["migration_policy_data"] = policy_data
+
+            status.markdown('<div class="status-text">Preview ready…</div>', unsafe_allow_html=True)
+            progress.progress(100)
+            status.empty()
+
+            st.success("Preview ready. Review the output, then generate the final document.")
+
+        except Exception as e:
+            st.error(f"Midnight failed: {str(e)}")
+
+    if "migration_policy_data" in st.session_state:
+        st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
+        a, b, c = st.columns([1, 1.25, 1])
+        with b:
+            if st.button("Generate Final Document", key="generate_migrated_doc"):
+                try:
+                    out_filename, docx_bytes = build_output_doc(st.session_state["migration_policy_data"])
+                    st.session_state["migration_filename"] = out_filename
+                    st.session_state["migration_docx"] = docx_bytes
+                except Exception as e:
+                    st.error(f"Document build failed: {str(e)}")
+
+            if "migration_docx" in st.session_state:
+                st.markdown('<div class="success-box">✓ Transformation complete</div>', unsafe_allow_html=True)
+                st.download_button(
+                    label=f"Download {st.session_state['migration_filename']}",
+                    data=st.session_state["migration_docx"],
+                    file_name=st.session_state["migration_filename"],
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    key="download_migrated_doc",
+                )
+
+else:
+    st.markdown('<div class="workspace-title">Create Policy</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="workspace-subtitle">Target template: {st.session_state["selected_template"]}</div>',
+        unsafe_allow_html=True,
+    )
+
+    form_col, preview_col = st.columns([1.08, 1])
+
+    with form_col:
+        st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+        st.markdown("### Intake")
+
+        with st.form("create_policy_form"):
+            create_template = st.selectbox(
+                "Template Target",
                 TEMPLATE_OPTIONS,
                 index=TEMPLATE_OPTIONS.index(st.session_state["selected_template"]),
-                key="migrate_template_selector",
+                key="create_template_selector",
             )
-            st.session_state["selected_template"] = migrate_template
+            st.session_state["selected_template"] = create_template
 
-            uploaded_file = st.file_uploader(
-                "Upload a legacy policy document",
-                type=["docx", "txt", "md"],
-                label_visibility="collapsed",
-                key="migrate_upload",
+            policy_name = st.text_input("Policy Name")
+            meta1, meta2, meta3 = st.columns(3)
+            with meta1:
+                policy_number = st.text_input("Policy Number")
+            with meta2:
+                version = st.text_input("Version", value="V1.0")
+            with meta3:
+                grc_id = st.text_input("GRC ID")
+
+            meta4, meta5, meta6 = st.columns(3)
+            with meta4:
+                effective_date = st.text_input("Effective Date")
+            with meta5:
+                last_reviewed = st.text_input("Last Reviewed")
+            with meta6:
+                last_revised = st.text_input("Last Revised")
+
+            supersedes = st.text_input("Supersedes")
+            custodians = st.text_input("Custodians")
+
+            owner1, owner2 = st.columns(2)
+            with owner1:
+                owner_name = st.text_input("Owner Name")
+            with owner2:
+                owner_title = st.text_input("Owner Title")
+
+            approver1, approver2 = st.columns(2)
+            with approver1:
+                approver_name = st.text_input("Approver Name")
+            with approver2:
+                approver_title = st.text_input("Approver Title")
+
+            signed1, signed2 = st.columns(2)
+            with signed1:
+                date_signed = st.text_input("Date Signed")
+            with signed2:
+                date_approved = st.text_input("Date Approved")
+
+            purpose = st.text_area("Purpose", height=120)
+            definitions_text = st.text_area(
+                "Definitions (one per line, format: Term: Definition)",
+                height=120,
+            )
+            policy_statement = st.text_area("Policy Statement", height=140)
+            procedures_text = st.text_area(
+                "Procedures (one line per step; use '- ' for bullets)",
+                height=220,
+            )
+            related_policies_text = st.text_area(
+                "Related Policies (one per line)",
+                height=100,
+            )
+            citations_text = st.text_area(
+                "Citations / References (one per line)",
+                height=100,
             )
 
-            run_migration = st.button("Transform Policy", key="run_migration")
-            st.markdown("</div>", unsafe_allow_html=True)
+            create_preview = st.form_submit_button("Build Preview")
 
-        with right:
-            st.markdown('<div class="panel-card">', unsafe_allow_html=True)
-            st.markdown("### Preview")
-            if "migration_policy_data" in st.session_state:
-                render_policy_preview(st.session_state["migration_policy_data"])
-            else:
-                st.info("Run a migration to preview the extracted policy before generating the final document.")
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        if run_migration:
-            api_key = get_api_key()
+        if create_preview:
+            created_policy_data = build_creation_policy_data(
+                policy_name,
+                policy_number,
+                version,
+                grc_id,
+                supersedes,
+                effective_date,
+                last_reviewed,
+                last_revised,
+                custodians,
+                owner_name,
+                owner_title,
+                approver_name,
+                approver_title,
+                date_signed,
+                date_approved,
+                purpose,
+                definitions_text,
+                policy_statement,
+                procedures_text,
+                related_policies_text,
+                citations_text,
+                st.session_state["selected_template"],
+            )
+            st.session_state["created_policy_data"] = created_policy_data
+            st.success("Preview ready.")
 
-            if not api_key:
-                st.error("No Groq API key found. Set GROQ_API_KEY in Streamlit secrets or use the local fallback for testing.")
-                st.stop()
-
-            if not uploaded_file:
-                st.error("Please upload a legacy policy document.")
-                st.stop()
-
-            doc_text = get_uploaded_text(uploaded_file)
-
-            if len(doc_text.strip()) < 50:
-                st.error("Document appears to be empty or too short.")
-                st.stop()
-
-            progress = st.progress(0)
-            status = st.empty()
-
-            try:
-                status.markdown('<div class="status-text">Reading document…</div>', unsafe_allow_html=True)
-                progress.progress(15)
-
-                client = Groq(api_key=api_key)
-
-                status.markdown('<div class="status-text">Extracting policy structure…</div>', unsafe_allow_html=True)
-                progress.progress(35)
-
-                response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": EXTRACTION_PROMPT + "\n\n" + doc_text,
-                        }
-                    ],
-                    temperature=0.1,
-                    max_tokens=8000,
-                )
-
-                raw_output = response.choices[0].message.content.strip()
-
-                status.markdown('<div class="status-text">Parsing extracted data…</div>', unsafe_allow_html=True)
-                progress.progress(60)
-
-                policy_data = parse_policy_data(raw_output)
-
-                if not policy_data:
-                    st.error("The model response could not be parsed into POLICY_DATA.")
-                    with st.expander("Raw model output"):
-                        st.code(raw_output)
-                    st.stop()
-
-                policy_data["template_name"] = st.session_state["selected_template"]
-                st.session_state["migration_policy_data"] = policy_data
-
-                status.markdown('<div class="status-text">Preview ready…</div>', unsafe_allow_html=True)
-                progress.progress(100)
-                status.empty()
-
-                st.success("Preview ready. Review the output, then generate the final document.")
-
-            except Exception as e:
-                st.error(f"Midnight failed: {str(e)}")
-
-        if "migration_policy_data" in st.session_state:
-            st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
-            a, b, c = st.columns([1, 1.25, 1])
-            with b:
-                if st.button("Generate Final Document", key="generate_migrated_doc"):
-                    try:
-                        out_filename, docx_bytes = build_output_doc(st.session_state["migration_policy_data"])
-                        st.session_state["migration_filename"] = out_filename
-                        st.session_state["migration_docx"] = docx_bytes
-                    except Exception as e:
-                        st.error(f"Document build failed: {str(e)}")
-
-                if "migration_docx" in st.session_state:
-                    st.markdown('<div class="success-box">✓ Transformation complete</div>', unsafe_allow_html=True)
-                    st.download_button(
-                        label=f"Download {st.session_state['migration_filename']}",
-                        data=st.session_state["migration_docx"],
-                        file_name=st.session_state["migration_filename"],
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        key="download_migrated_doc",
-                    )
-
-    elif st.session_state["active_mode"] == "create":
-        st.markdown('<div class="workspace-title">Create Policy</div>', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="workspace-subtitle">Target template: {st.session_state["selected_template"]}</div>',
-            unsafe_allow_html=True,
-        )
-
-        form_col, preview_col = st.columns([1.08, 1])
-
-        with form_col:
-            st.markdown('<div class="panel-card">', unsafe_allow_html=True)
-            st.markdown("### Intake")
-
-            with st.form("create_policy_form"):
-                create_template = st.selectbox(
-                    "Template Target",
-                    TEMPLATE_OPTIONS,
-                    index=TEMPLATE_OPTIONS.index(st.session_state["selected_template"]),
-                    key="create_template_selector",
-                )
-                st.session_state["selected_template"] = create_template
-
-                policy_name = st.text_input("Policy Name")
-                meta1, meta2, meta3 = st.columns(3)
-                with meta1:
-                    policy_number = st.text_input("Policy Number")
-                with meta2:
-                    version = st.text_input("Version", value="V1.0")
-                with meta3:
-                    grc_id = st.text_input("GRC ID")
-
-                meta4, meta5, meta6 = st.columns(3)
-                with meta4:
-                    effective_date = st.text_input("Effective Date")
-                with meta5:
-                    last_reviewed = st.text_input("Last Reviewed")
-                with meta6:
-                    last_revised = st.text_input("Last Revised")
-
-                supersedes = st.text_input("Supersedes")
-                custodians = st.text_input("Custodians")
-
-                owner1, owner2 = st.columns(2)
-                with owner1:
-                    owner_name = st.text_input("Owner Name")
-                with owner2:
-                    owner_title = st.text_input("Owner Title")
-
-                approver1, approver2 = st.columns(2)
-                with approver1:
-                    approver_name = st.text_input("Approver Name")
-                with approver2:
-                    approver_title = st.text_input("Approver Title")
-
-                signed1, signed2 = st.columns(2)
-                with signed1:
-                    date_signed = st.text_input("Date Signed")
-                with signed2:
-                    date_approved = st.text_input("Date Approved")
-
-                purpose = st.text_area("Purpose", height=120)
-                definitions_text = st.text_area(
-                    "Definitions (one per line, format: Term: Definition)",
-                    height=120,
-                )
-                policy_statement = st.text_area("Policy Statement", height=140)
-                procedures_text = st.text_area(
-                    "Procedures (one line per step; use '- ' for bullets)",
-                    height=220,
-                )
-                related_policies_text = st.text_area(
-                    "Related Policies (one per line)",
-                    height=100,
-                )
-                citations_text = st.text_area(
-                    "Citations / References (one per line)",
-                    height=100,
-                )
-
-                create_preview = st.form_submit_button("Build Preview")
-
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            if create_preview:
-                created_policy_data = build_creation_policy_data(
-                    policy_name,
-                    policy_number,
-                    version,
-                    grc_id,
-                    supersedes,
-                    effective_date,
-                    last_reviewed,
-                    last_revised,
-                    custodians,
-                    owner_name,
-                    owner_title,
-                    approver_name,
-                    approver_title,
-                    date_signed,
-                    date_approved,
-                    purpose,
-                    definitions_text,
-                    policy_statement,
-                    procedures_text,
-                    related_policies_text,
-                    citations_text,
-                    st.session_state["selected_template"],
-                )
-                st.session_state["created_policy_data"] = created_policy_data
-                st.success("Preview ready.")
-
-        with preview_col:
-            st.markdown('<div class="panel-card">', unsafe_allow_html=True)
-            st.markdown("### Preview")
-            if "created_policy_data" in st.session_state:
-                render_policy_preview(st.session_state["created_policy_data"])
-            else:
-                st.info("Complete the intake form and build a preview to review the policy before generating the final document.")
-            st.markdown("</div>", unsafe_allow_html=True)
-
+    with preview_col:
+        st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+        st.markdown("### Preview")
         if "created_policy_data" in st.session_state:
-            st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
-            c1, c2, c3 = st.columns([1, 1.25, 1])
-            with c2:
-                if st.button("Generate Created Policy", key="generate_created_doc"):
-                    try:
-                        out_filename, docx_bytes = build_output_doc(st.session_state["created_policy_data"])
-                        st.session_state["created_filename"] = out_filename
-                        st.session_state["created_docx"] = docx_bytes
-                    except Exception as e:
-                        st.error(f"Document build failed: {str(e)}")
+            render_policy_preview(st.session_state["created_policy_data"])
+        else:
+            st.info("Complete the intake form and build a preview to review the policy before generating the final document.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-                if "created_docx" in st.session_state:
-                    st.markdown('<div class="success-box">✓ Policy generated</div>', unsafe_allow_html=True)
-                    st.download_button(
-                        label=f"Download {st.session_state['created_filename']}",
-                        data=st.session_state["created_docx"],
-                        file_name=st.session_state["created_filename"],
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        key="download_created_doc",
-                    )
+    if "created_policy_data" in st.session_state:
+        st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
+        c1, c2, c3 = st.columns([1, 1.25, 1])
+        with c2:
+            if st.button("Generate Created Policy", key="generate_created_doc"):
+                try:
+                    out_filename, docx_bytes = build_output_doc(st.session_state["created_policy_data"])
+                    st.session_state["created_filename"] = out_filename
+                    st.session_state["created_docx"] = docx_bytes
+                except Exception as e:
+                    st.error(f"Document build failed: {str(e)}")
 
-    st.markdown("</div>", unsafe_allow_html=True)
+            if "created_docx" in st.session_state:
+                st.markdown('<div class="success-box">✓ Policy generated</div>', unsafe_allow_html=True)
+                st.download_button(
+                    label=f"Download {st.session_state['created_filename']}",
+                    data=st.session_state["created_docx"],
+                    file_name=st.session_state["created_filename"],
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    key="download_created_doc",
+                )
+
+st.markdown("</div>", unsafe_allow_html=True)
