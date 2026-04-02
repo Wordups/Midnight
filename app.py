@@ -170,7 +170,7 @@ st.markdown("""
 
 # ── Header ─────────────────────────────────────────────────────────────
 st.markdown('<div class="midnight-title">MIDNIGHT</div>', unsafe_allow_html=True)
-st.markdown('<div class="midnight-subtitle">Policy Migration Pipeline &nbsp;·&nbsp; Wipro HealthPlan Services</div>', unsafe_allow_html=True)
+st.markdown('<div class="midnight-subtitle">Policy Migration Pipeline</div>
 st.markdown('<hr class="midnight-divider">', unsafe_allow_html=True)
 
 # ── API Key ────────────────────────────────────────────────────────────
