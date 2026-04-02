@@ -5,6 +5,7 @@ A product developed by Takeoff
 
 import os
 import tempfile
+from datetime import datetime
 import streamlit as st
 from groq import Groq
 from docx import Document
@@ -15,17 +16,65 @@ from hps_policy_migration_builder import build_policy_document
 # ============================================================================
 LOCAL_GROQ_API_KEY = ""
 
+# ============================================================================
+# DEMO SAMPLE
+# ============================================================================
+DEMO_SOURCE_TEXT = """
+SEC-P020 Mobile Device Management in the Workplace
 
-def get_api_key() -> str:
-    try:
-        secret_key = st.secrets.get("GROQ_API_KEY", "")
-    except Exception:
-        secret_key = ""
-    return secret_key or os.getenv("GROQ_API_KEY", "") or LOCAL_GROQ_API_KEY
+Purpose:
+This policy defines the requirements for managing mobile devices used to access company systems and data.
 
+Definitions:
+iGel: Thin client endpoint environment.
+WYSE: Thin client platform.
+Jail-broken: A mobile device that has been modified to bypass manufacturer restrictions.
+
+Policy Statement:
+All mobile devices used to access company systems must be approved, secured, and managed in accordance with company requirements.
+
+Procedures:
+1. Only approved mobile devices may connect to company email or applications.
+2. Devices must use strong authentication.
+3. Lost or stolen devices must be reported immediately.
+4. Unsupported or jail-broken devices are prohibited.
+5. Mobile device settings must align with security baselines.
+6. Exceptions must be reviewed and approved.
+
+Related Policies:
+SEC-P001 Information Security Governing Policy
+SEC-C002 Access Control Standard
+
+Citations:
+PCI DSS
+HIPAA Security Rule
+"""
+
+DEMO_SCENARIO_AMY = """
+**Amy (Compliance Manager):**  
+“We have audits coming up. The template changed and these documents need to be updated.”
+"""
+
+DEMO_SCENARIO_BRIAN = """
+**Brian (GRC):**  
+“Got it.”
+
+Without Midnight, Brian now spends hours manually reviewing the source, copying content into the new structure, fixing formatting, and cross-checking the final output.
+
+**Manual effort:** 60–80 hours  
+**Risk:** inconsistency, missed updates, audit pressure
+"""
+
+TEMPLATE_OPTIONS = [
+    "Generic Policy Template",
+    "Wipro HealthPlan Services (Current)",
+]
+
+PAGE_OPTIONS = ["Overview", "Workspace"]
+WORKFLOW_OPTIONS = ["Demo Mode", "Migrate Policy", "Create Policy"]
 
 # ============================================================================
-# PROMPT CONFIG
+# PROMPT
 # ============================================================================
 EXTRACTION_PROMPT = """
 You are a policy migration specialist.
@@ -100,63 +149,6 @@ HERE IS THE LEGACY POLICY DOCUMENT:
 """
 
 # ============================================================================
-# DEMO SAMPLE
-# ============================================================================
-DEMO_SOURCE_TEXT = """
-SEC-P020 Mobile Device Management in the Workplace
-
-Purpose:
-This policy defines the requirements for managing mobile devices used to access company systems and data.
-
-Definitions:
-iGel: Thin client endpoint environment.
-WYSE: Thin client platform.
-Jail-broken: A mobile device that has been modified to bypass manufacturer restrictions.
-
-Policy Statement:
-All mobile devices used to access company systems must be approved, secured, and managed in accordance with company requirements.
-
-Procedures:
-1. Only approved mobile devices may connect to company email or applications.
-2. Devices must use strong authentication.
-3. Lost or stolen devices must be reported immediately.
-4. Unsupported or jail-broken devices are prohibited.
-5. Mobile device settings must align with security baselines.
-6. Exceptions must be reviewed and approved.
-
-Related Policies:
-SEC-P001 Information Security Governing Policy
-SEC-C002 Access Control Standard
-
-Citations:
-PCI DSS
-HIPAA Security Rule
-"""
-
-DEMO_SCENARIO_AMY = """
-**Amy (Compliance Manager):**  
-“Hey Brian — we have audits coming up. We refined the template and need these documents updated.”
-"""
-
-DEMO_SCENARIO_BRIAN = """
-**Brian (GRC):**  
-“Got it.”
-
-At this point, Brian has to manually review the documents, copy and paste content into the updated structure, validate formatting, and cross-reference the result.
-
-**Manual effort:** 60–80 hours  
-**Risk:** inconsistency, missed updates, audit pressure
-"""
-
-TEMPLATE_OPTIONS = [
-    "Generic Policy Template",
-    "Wipro HealthPlan Services (Current)",
-]
-
-PAGE_OPTIONS = ["Overview", "Workspace"]
-WORKFLOW_OPTIONS = ["Demo Mode", "Migrate Policy", "Create Policy"]
-
-# ============================================================================
 # PAGE CONFIG
 # ============================================================================
 st.set_page_config(
@@ -170,25 +162,24 @@ st.markdown(
     """
     <style>
         :root {
-            --app-bg: #f5f5f7;
-            --panel-bg: #ffffff;
-            --panel-soft: #fafafc;
-            --text-main: #111111;
-            --text-sub: #6e6e73;
-            --border: rgba(0,0,0,0.07);
-            --border-soft: rgba(0,0,0,0.05);
-            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --bg: #f5f5f7;
+            --surface: #ffffff;
+            --surface-soft: #fafafc;
+            --text: #111111;
+            --subtext: #6e6e73;
+            --line: rgba(0,0,0,0.08);
+            --line-soft: rgba(0,0,0,0.05);
+            --shadow: 0 10px 28px rgba(0,0,0,0.05);
         }
 
         .stApp {
-            background: linear-gradient(180deg, #fbfbfc 0%, #f4f4f6 100%);
-            color: var(--text-main);
+            background: var(--bg);
+            color: var(--text);
         }
 
         .block-container {
-            max-width: 1320px;
-            margin: 0 auto;
-            padding-top: 0.9rem;
+            max-width: 1240px;
+            padding-top: 0.8rem;
             padding-bottom: 2rem;
         }
 
@@ -196,255 +187,163 @@ st.markdown(
 
         .topbar {
             background: rgba(255,255,255,0.78);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-soft);
-            border-radius: 24px;
-            padding: 1rem 1.15rem;
+            border: 1px solid var(--line-soft);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
             margin-bottom: 1rem;
             box-shadow: var(--shadow);
         }
 
-        .topbar-grid {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .topbar-eyebrow {
+        .eyebrow {
             color: #8e8e93;
             font-size: 0.72rem;
             letter-spacing: 0.24em;
             text-transform: uppercase;
-            margin-bottom: 0.45rem;
+            margin-bottom: 0.35rem;
         }
 
-        .topbar-title {
+        .brand {
             font-size: 2rem;
             font-weight: 700;
             letter-spacing: 0.04em;
-            color: #111111;
-            margin-bottom: 0.15rem;
+            color: var(--text);
+            margin-bottom: 0.1rem;
         }
 
-        .topbar-subtitle {
-            color: #6e6e73;
-            font-size: 0.94rem;
+        .subbrand {
+            color: var(--subtext);
+            font-size: 0.95rem;
         }
 
-        .hero-shell {
-            background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.78));
-            border: 1px solid var(--border-soft);
-            border-radius: 30px;
+        .hero {
+            background: var(--surface);
+            border: 1px solid var(--line-soft);
+            border-radius: 24px;
+            padding: 2.2rem 2rem;
             box-shadow: var(--shadow);
-            padding: 3rem 2rem 2.4rem 2rem;
             margin-bottom: 1rem;
-        }
-
-        .hero-eyebrow {
-            color: #8e8e93;
-            font-size: 0.74rem;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            margin-bottom: 0.8rem;
         }
 
         .hero-title {
-            font-size: 4rem;
+            font-size: 3.3rem;
             font-weight: 700;
-            line-height: 0.95;
-            color: #111111;
-            letter-spacing: 0.06em;
-            margin-bottom: 0.9rem;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
+            line-height: 0.95;
+            margin-bottom: 0.8rem;
+            color: var(--text);
         }
 
-        .hero-subtitle {
-            color: #6e6e73;
-            font-size: 1.05rem;
-            max-width: 700px;
+        .hero-copy {
+            max-width: 760px;
+            color: var(--subtext);
+            font-size: 1.02rem;
             line-height: 1.7;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        .value-strip {
+        .pill-row {
             display: flex;
+            gap: 0.5rem;
             flex-wrap: wrap;
-            gap: 0.55rem;
-            margin-bottom: 1.4rem;
+            margin-bottom: 1rem;
         }
 
-        .value-pill {
+        .pill {
             display: inline-block;
-            padding: 0.38rem 0.72rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            color: #5a5a5f;
+            background: var(--surface-soft);
+            border: 1px solid var(--line-soft);
+            color: #5f5f64;
             font-size: 0.78rem;
         }
 
-        .card-grid-space {
-            margin-top: 0.8rem;
-        }
-
-        .glass-card {
-            background: #ffffff;
-            border: 1px solid var(--border);
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--line-soft);
             border-radius: 24px;
             box-shadow: var(--shadow);
-            padding: 1.2rem;
+            padding: 1.25rem;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+
+        .section-copy {
+            color: var(--subtext);
+            font-size: 0.92rem;
+            margin-bottom: 1rem;
+        }
+
+        .soft-box {
+            background: var(--surface-soft);
+            border: 1px solid var(--line-soft);
+            border-radius: 18px;
+            padding: 1rem;
+        }
+
+        .metric {
+            background: var(--surface-soft);
+            border: 1px solid var(--line-soft);
+            border-radius: 16px;
+            padding: 0.9rem;
+            text-align: center;
             height: 100%;
         }
 
-        .card-title {
-            color: #111111;
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-copy {
-            color: #6e6e73;
-            font-size: 0.92rem;
-            line-height: 1.65;
-        }
-
-        .demo-story {
-            background: #fafafc;
-            border: 1px solid var(--border-soft);
-            border-radius: 18px;
-            padding: 1rem;
-            margin-top: 0.8rem;
-        }
-
-        .shell-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            box-shadow: var(--shadow);
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .left-nav {
-            background: linear-gradient(180deg, #fbfbfc 0%, #f1f1f4 100%);
-            border-right: 1px solid var(--border-soft);
-            min-height: 78vh;
-            padding: 1.05rem;
-        }
-
-        .nav-section-label {
-            color: #8e8e93;
-            font-size: 0.72rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            margin-bottom: 0.6rem;
-        }
-
-        .nav-hero {
-            padding: 0.35rem 0 1rem 0;
-            border-bottom: 1px solid var(--border-soft);
-            margin-bottom: 1rem;
-        }
-
-        .nav-hero-title {
+        .metric-number {
             font-size: 1.55rem;
             font-weight: 700;
-            color: #111111;
-            margin-bottom: 0.2rem;
+            color: var(--text);
+            margin-bottom: 0.15rem;
         }
 
-        .nav-hero-copy {
-            color: #6e6e73;
-            font-size: 0.9rem;
-            line-height: 1.55;
+        .metric-label {
+            color: var(--subtext);
+            font-size: 0.8rem;
         }
 
-        .nav-meta {
-            padding: 0.9rem 0 0.85rem 0;
-            border-bottom: 1px solid var(--border-soft);
+        .workspace-header {
             margin-bottom: 1rem;
         }
 
-        .nav-pill {
-            display: inline-block;
-            padding: 0.32rem 0.66rem;
-            border-radius: 999px;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            color: #5a5a5f;
-            font-size: 0.75rem;
-            margin-right: 0.35rem;
-            margin-bottom: 0.45rem;
-        }
-
-        .content-pane {
-            background: #ffffff;
-            min-height: 78vh;
-            padding: 1.1rem;
-        }
-
-        .pane-header {
-            padding: 0.3rem 0 0.9rem 0;
-            border-bottom: 1px solid var(--border-soft);
-            margin-bottom: 1rem;
-        }
-
-        .pane-title {
+        .workspace-title {
             font-size: 1.45rem;
             font-weight: 700;
-            color: #111111;
+            color: var(--text);
             margin-bottom: 0.2rem;
         }
 
-        .pane-subtitle {
-            color: #6e6e73;
+        .workspace-subtitle {
+            color: var(--subtext);
             font-size: 0.92rem;
         }
 
-        .panel-card {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 22px;
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line-soft);
+            border-radius: 20px;
             padding: 1rem;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
             height: 100%;
         }
 
         .preview-box {
-            background: #fafafc;
-            border: 1px solid var(--border-soft);
-            border-radius: 18px;
-            padding: 1rem;
-        }
-
-        .demo-box {
-            background: linear-gradient(180deg, #fafafc 0%, #f6f6f8 100%);
-            border: 1px solid var(--border-soft);
-            border-radius: 18px;
-            padding: 1rem;
-        }
-
-        .metric-box {
-            background: #ffffff;
-            border: 1px solid var(--border-soft);
+            background: var(--surface-soft);
+            border: 1px solid var(--line-soft);
             border-radius: 16px;
-            padding: 0.9rem;
-            text-align: center;
+            padding: 1rem;
         }
 
-        .metric-number {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #111111;
-            margin-bottom: 0.2rem;
-        }
-
-        .metric-label {
-            color: #6e6e73;
-            font-size: 0.82rem;
+        .caption {
+            color: #8e8e93;
+            font-size: 0.8rem;
+            margin-bottom: 0.65rem;
         }
 
         .success-box {
@@ -465,35 +364,8 @@ st.markdown(
             font-size: 0.88rem;
         }
 
-        .caption-text {
-            color: #8e8e93;
-            font-size: 0.8rem;
-            margin-bottom: 0.65rem;
-        }
-
-        .subtle-note {
-            color: #6e6e73;
-            font-size: 0.88rem;
-            line-height: 1.55;
-            background: #fafafc;
-            border: 1px solid var(--border-soft);
-            border-radius: 16px;
-            padding: 0.85rem 0.95rem;
-            margin: 0.55rem 0 0.85rem 0;
-        }
-
         .divider-space {
-            height: 0.55rem;
-        }
-
-        .nav-spacer {
-            height: 0.5rem;
-        }
-
-        .workflow-help {
-            color: #6e6e73;
-            font-size: 0.9rem;
-            line-height: 1.6;
+            height: 0.6rem;
         }
 
         .stButton > button {
@@ -515,7 +387,7 @@ st.markdown(
             width: 100% !important;
             background: #f2f2f4 !important;
             color: #111111 !important;
-            border: 1px solid var(--border) !important;
+            border: 1px solid var(--line) !important;
             border-radius: 14px !important;
             padding: 0.92rem 1rem !important;
             font-weight: 600 !important;
@@ -525,12 +397,12 @@ st.markdown(
         .stTextArea textarea,
         .stSelectbox div[data-baseweb="select"] > div {
             background: #ffffff !important;
-            border: 1px solid var(--border) !important;
+            border: 1px solid var(--line) !important;
             border-radius: 14px !important;
         }
 
         .stFileUploader > div {
-            background: #fafafc !important;
+            background: var(--surface-soft) !important;
             border: 1px dashed rgba(0,0,0,0.15) !important;
             border-radius: 14px !important;
         }
@@ -547,8 +419,7 @@ st.markdown(
             background: transparent !important;
             border: 1px solid transparent !important;
             border-radius: 14px !important;
-            padding: 0.75rem 0.85rem !important;
-            transition: all .15s ease;
+            padding: 0.65rem 0.85rem !important;
         }
 
         div[data-testid="stRadio"] label:hover {
@@ -562,7 +433,7 @@ st.markdown(
 
         div[data-testid="stRadio"] label:has(input:checked) {
             background: #ffffff !important;
-            border: 1px solid var(--border) !important;
+            border: 1px solid var(--line) !important;
             box-shadow: 0 4px 14px rgba(0,0,0,0.04);
         }
 
@@ -573,6 +444,15 @@ st.markdown(
         h1, h2, h3 {
             color: #111111 !important;
         }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero {
+                padding: 1.5rem 1.2rem;
+            }
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -582,6 +462,14 @@ st.markdown(
 # ============================================================================
 # HELPERS
 # ============================================================================
+def get_api_key() -> str:
+    try:
+        secret_key = st.secrets.get("GROQ_API_KEY", "")
+    except Exception:
+        secret_key = ""
+    return secret_key or os.getenv("GROQ_API_KEY", "") or LOCAL_GROQ_API_KEY
+
+
 def parse_policy_data(raw_output: str):
     if "POLICY_DATA = {" in raw_output:
         dict_str = raw_output[raw_output.index("POLICY_DATA = {"):]
@@ -638,6 +526,54 @@ def make_procedures_from_text(text: str):
     return procedures
 
 
+def normalize_date_input(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return ""
+    for fmt in ("%m/%d/%Y", "%m/%d/%y", "%Y-%m-%d"):
+        try:
+            dt = datetime.strptime(value, fmt)
+            return dt.strftime("%-m/%-d/%Y")
+        except Exception:
+            pass
+    return value
+
+
+def parse_date_safe(value: str):
+    value = normalize_date_input(value)
+    if not value:
+        return None
+    for fmt in ("%m/%d/%Y",):
+        try:
+            return datetime.strptime(value, fmt)
+        except Exception:
+            pass
+    return None
+
+
+def default_if_blank(current: str, source: str) -> str:
+    return current if str(current).strip() else source
+
+
+def validate_dates(effective_date, last_reviewed, last_revised, date_signed, date_approved):
+    errors = []
+
+    eff = parse_date_safe(effective_date)
+    revw = parse_date_safe(last_reviewed)
+    revd = parse_date_safe(last_revised)
+    signed = parse_date_safe(date_signed)
+    approved = parse_date_safe(date_approved)
+
+    if eff and revw and revw < eff:
+        errors.append("Last Reviewed cannot be earlier than Effective Date.")
+    if eff and revd and revd < eff:
+        errors.append("Last Revised cannot be earlier than Effective Date.")
+    if signed and approved and approved < signed:
+        errors.append("Date Approved cannot be earlier than Date Signed.")
+
+    return errors
+
+
 def build_creation_policy_data(
     policy_name,
     policy_number,
@@ -662,6 +598,12 @@ def build_creation_policy_data(
     citations_text,
     template_name,
 ):
+    effective_date = normalize_date_input(effective_date)
+    last_reviewed = normalize_date_input(default_if_blank(last_reviewed, effective_date))
+    last_revised = normalize_date_input(default_if_blank(last_revised, effective_date))
+    date_signed = normalize_date_input(default_if_blank(date_signed, effective_date))
+    date_approved = normalize_date_input(default_if_blank(date_approved, date_signed))
+
     definitions = {}
     for line in split_lines(definitions_text):
         if ":" in line:
@@ -685,7 +627,7 @@ def build_creation_policy_data(
     return {
         "policy_name": policy_name,
         "policy_number": policy_number,
-        "version": version,
+        "version": version or "V1.0",
         "grc_id": grc_id,
         "supersedes": supersedes,
         "effective_date": effective_date,
@@ -729,12 +671,13 @@ def render_policy_preview(policy_data):
     st.markdown(f"**Version:** {policy_data.get('version', '')}")
     st.markdown(f"**Owner:** {policy_data.get('owner_name', '')} — {policy_data.get('owner_title', '')}")
     st.markdown(f"**Approver:** {policy_data.get('approver_name', '')} — {policy_data.get('approver_title', '')}")
+    st.markdown(f"**Effective Date:** {policy_data.get('effective_date', '')}")
 
     st.markdown("#### Purpose")
-    st.write(policy_data.get("purpose", ""))
+    st.write(policy_data.get("purpose", "") or "Not provided")
 
     st.markdown("#### Policy Statement")
-    st.write(policy_data.get("policy_statement", ""))
+    st.write(policy_data.get("policy_statement", "") or "Not provided")
 
     st.markdown("#### Definitions")
     definitions = policy_data.get("definitions", {})
@@ -742,7 +685,7 @@ def render_policy_preview(policy_data):
         for key, value in definitions.items():
             st.markdown(f"- **{key}:** {value}")
     else:
-        st.write("No definitions captured.")
+        st.write("Not provided")
 
     st.markdown("#### Procedures")
     procedures = policy_data.get("procedures", [])
@@ -760,7 +703,8 @@ def render_policy_preview(policy_data):
                 st.markdown(f"**{item.get('bold', '')}** {item.get('rest', '')}")
             else:
                 st.write(text)
-
+    else:
+        st.write("Not provided")
     st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -802,10 +746,7 @@ def run_llm_transform(source_text: str, template_name: str):
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {
-                    "role": "user",
-                    "content": EXTRACTION_PROMPT + "\n\n" + source_text,
-                }
+                {"role": "user", "content": EXTRACTION_PROMPT + "\n\n" + source_text}
             ],
             temperature=0.1,
             max_tokens=8000,
@@ -857,208 +798,172 @@ if "demo_policy_data" not in st.session_state:
 # TOP BAR
 # ============================================================================
 st.markdown('<div class="topbar">', unsafe_allow_html=True)
-st.markdown('<div class="topbar-grid">', unsafe_allow_html=True)
+top_left, top_right = st.columns([0.72, 0.28])
 
-with st.container():
-    left_top, right_top = st.columns([0.72, 0.28])
+with top_left:
+    st.markdown('<div class="eyebrow">Takeoff Product</div>', unsafe_allow_html=True)
+    st.markdown('<div class="brand">MIDNIGHT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subbrand">Policy Migration Engine</div>', unsafe_allow_html=True)
 
-    with left_top:
-        st.markdown('<div class="topbar-eyebrow">Takeoff Product</div>', unsafe_allow_html=True)
-        st.markdown('<div class="topbar-title">MIDNIGHT</div>', unsafe_allow_html=True)
-        st.markdown('<div class="topbar-subtitle">Policy Migration Engine</div>', unsafe_allow_html=True)
+with top_right:
+    selected_page = st.radio(
+        "Page Navigation",
+        PAGE_OPTIONS,
+        horizontal=True,
+        label_visibility="collapsed",
+        index=PAGE_OPTIONS.index(st.session_state["selected_page"]),
+        key="page_nav",
+    )
+    st.session_state["selected_page"] = selected_page
 
-    with right_top:
-        selected_page = st.radio(
-            "Page Navigation",
-            PAGE_OPTIONS,
-            horizontal=True,
-            label_visibility="collapsed",
-            index=PAGE_OPTIONS.index(st.session_state["selected_page"]),
-            key="page_nav",
-        )
-        st.session_state["selected_page"] = selected_page
-
-st.markdown('</div>', unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
 # ============================================================================
-# OVERVIEW PAGE
+# OVERVIEW
 # ============================================================================
 if st.session_state["selected_page"] == "Overview":
-    st.markdown('<div class="hero-shell">', unsafe_allow_html=True)
-    st.markdown('<div class="hero-eyebrow">Policy Intelligence Engine</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero">', unsafe_allow_html=True)
+    st.markdown('<div class="eyebrow">Policy Intelligence Engine</div>', unsafe_allow_html=True)
     st.markdown('<div class="hero-title">MIDNIGHT</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="hero-subtitle">'
-        'Automate policy creation, migration, and audit readiness through a controlled documentation workflow.'
-        '</div>',
+        '<div class="hero-copy">Automate policy creation, migration, and audit readiness through a controlled documentation workflow.</div>',
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="value-strip">', unsafe_allow_html=True)
-    st.markdown('<span class="value-pill">Reduce audit prep time</span>', unsafe_allow_html=True)
-    st.markdown('<span class="value-pill">Standardize policy workflows</span>', unsafe_allow_html=True)
-    st.markdown('<span class="value-pill">Generate structured output</span>', unsafe_allow_html=True)
-    st.markdown('<span class="value-pill">Support procedures, runbooks, and playbooks</span>', unsafe_allow_html=True)
+    st.markdown('<div class="pill-row">', unsafe_allow_html=True)
+    st.markdown('<span class="pill">Reduce audit prep time</span>', unsafe_allow_html=True)
+    st.markdown('<span class="pill">Standardize policy workflows</span>', unsafe_allow_html=True)
+    st.markdown('<span class="pill">Generate structured output</span>', unsafe_allow_html=True)
+    st.markdown('<span class="pill">Extend to procedures and playbooks</span>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    hero_cta_left, hero_cta_right = st.columns([0.2, 0.2])
-    with hero_cta_left:
+    c1, c2 = st.columns([0.22, 0.22])
+    with c1:
         if st.button("Enter Workspace", key="enter_workspace"):
             st.session_state["selected_page"] = "Workspace"
             st.rerun()
-    with hero_cta_right:
+    with c2:
         if st.button("Open Demo", key="open_demo"):
             st.session_state["selected_page"] = "Workspace"
             st.session_state["active_mode"] = "Demo Mode"
             st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    cards_left, cards_mid, cards_right = st.columns(3)
-
-    with cards_left:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Migrate Policy</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="card-copy">Convert legacy policy documents into the selected template structure without manual rework and formatting cleanup.</div>',
-            unsafe_allow_html=True,
-        )
+    row1_col1, row1_col2, row1_col3 = st.columns(3)
+    with row1_col1:
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Migrate Policy</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-copy">Convert legacy policy documents into the selected template without manual copy-and-paste rework.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with cards_mid:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Create Policy</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="card-copy">Generate a new policy from structured intake and produce a controlled .docx output aligned to the selected template.</div>',
-            unsafe_allow_html=True,
-        )
+    with row1_col2:
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Create Policy</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-copy">Generate a new policy from structured intake and produce a controlled .docx output.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with cards_right:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Runbooks & Procedures</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="card-copy">Extend the same engine beyond policies to support procedures, runbooks, playbooks, and broader security documentation.</div>',
-            unsafe_allow_html=True,
-        )
+    with row1_col3:
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Expand the Engine</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-copy">Apply the same workflow to procedures, runbooks, playbooks, and broader security documentation.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="card-grid-space"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
-    story_left, story_right = st.columns([0.56, 0.44])
-
-    with story_left:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">Why it matters</div>', unsafe_allow_html=True)
-        st.markdown('<div class="demo-story">', unsafe_allow_html=True)
+    left_story, right_story = st.columns([0.58, 0.42])
+    with left_story:
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Why it matters</div>', unsafe_allow_html=True)
+        st.markdown('<div class="soft-box">', unsafe_allow_html=True)
         st.markdown(DEMO_SCENARIO_AMY)
         st.markdown("---")
         st.markdown(DEMO_SCENARIO_BRIAN)
         st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with story_right:
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title">What Midnight changes</div>', unsafe_allow_html=True)
+    with right_story:
+        st.markdown('<div class="section">', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">What Midnight changes</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="card-copy">'
-            'Instead of spending 60–80 hours manually updating documents when templates change, teams can move through a guided workflow, review the preview, and generate structured output in seconds.'
-            '</div>',
+            '<div class="section-copy">Instead of spending 60–80 hours manually updating documents when templates change, teams move through a guided workflow, review a preview, and generate structured output in seconds.</div>',
             unsafe_allow_html=True,
         )
         st.markdown(
-            '<div class="subtle-note"><strong>Positioning:</strong> Midnight turns compliance documentation from manual effort into a controlled system.</div>',
+            '<div class="soft-box"><strong>Positioning:</strong> Midnight turns compliance documentation from manual effort into a controlled system.</div>',
             unsafe_allow_html=True,
         )
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ============================================================================
-# WORKSPACE PAGE
+# WORKSPACE
 # ============================================================================
 else:
-    st.markdown('<div class="shell-card">', unsafe_allow_html=True)
-    left_col, right_col = st.columns([0.28, 0.72], gap="small")
+    st.markdown('<div class="workspace-header">', unsafe_allow_html=True)
+    st.markdown('<div class="workspace-title">Workspace</div>', unsafe_allow_html=True)
+    st.markdown('<div class="workspace-subtitle">Choose a workflow, select a template, review the preview, then generate the final document.</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    with left_col:
-        st.markdown('<div class="left-nav">', unsafe_allow_html=True)
+    controls_left, controls_right = st.columns([0.35, 0.65], gap="medium")
 
-        st.markdown('<div class="nav-hero">', unsafe_allow_html=True)
-        st.markdown('<div class="nav-hero-title">Workspace</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="nav-hero-copy">Choose a workflow, select a template, review the preview, then generate the final document.</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown('<div class="nav-section-label">Template</div>', unsafe_allow_html=True)
-        selected_template = st.selectbox(
+    with controls_left:
+        st.markdown('<div class="panel">', unsafe_allow_html=True)
+        st.markdown("### Settings")
+        st.selectbox(
             "Template Target",
             TEMPLATE_OPTIONS,
             index=TEMPLATE_OPTIONS.index(st.session_state["selected_template"]),
             key="left_template_selector",
-            label_visibility="collapsed",
         )
-        st.session_state["selected_template"] = selected_template
+        st.session_state["selected_template"] = st.session_state["left_template_selector"]
 
-        st.markdown('<div class="nav-meta">', unsafe_allow_html=True)
-        st.markdown('<span class="nav-pill">Demo Story</span>', unsafe_allow_html=True)
-        st.markdown('<span class="nav-pill">.docx Upload</span>', unsafe_allow_html=True)
-        st.markdown('<span class="nav-pill">Preview</span>', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        st.markdown('<div class="nav-section-label">Workflow</div>', unsafe_allow_html=True)
+        st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
         mode = st.radio(
             "Workflow",
             WORKFLOW_OPTIONS,
-            label_visibility="collapsed",
             index=WORKFLOW_OPTIONS.index(st.session_state["active_mode"]),
+            key="workflow_selector",
         )
         st.session_state["active_mode"] = mode
 
-        st.markdown('<div class="nav-spacer"></div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="workflow-help">Start with Demo Mode to tell the story, then move into migration or policy creation.</div>',
+            '<div class="soft-box">Start with Demo Mode to tell the story, then move into migration or policy creation.</div>',
             unsafe_allow_html=True,
         )
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with right_col:
-        st.markdown('<div class="content-pane">', unsafe_allow_html=True)
-
+    with controls_right:
         if st.session_state["active_mode"] == "Demo Mode":
-            st.markdown('<div class="pane-header">', unsafe_allow_html=True)
-            st.markdown('<div class="pane-title">Demo Mode</div>', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="pane-subtitle">Show the compliance problem, the workflow shift, and the output in one guided flow.</div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('<div class="panel">', unsafe_allow_html=True)
+            st.markdown("### Demo Mode")
+            st.markdown('<div class="section-copy">Show the compliance problem, the workflow shift, and the output in one guided flow.</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-            story_left, story_right = st.columns([0.54, 0.46], gap="medium")
+            st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
-            with story_left:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            demo_top_left, demo_top_right = st.columns([0.56, 0.44], gap="medium")
+
+            with demo_top_left:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Audit Preparation Scenario")
-                st.markdown('<div class="demo-box">', unsafe_allow_html=True)
+                st.markdown('<div class="soft-box">', unsafe_allow_html=True)
                 st.markdown(DEMO_SCENARIO_AMY)
                 st.markdown("---")
                 st.markdown(DEMO_SCENARIO_BRIAN)
                 st.markdown("</div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
 
-            with story_right:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            with demo_top_right:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Business Impact")
                 m1, m2, m3 = st.columns(3)
                 with m1:
-                    st.markdown('<div class="metric-box"><div class="metric-number">80h</div><div class="metric-label">Manual effort avoided</div></div>', unsafe_allow_html=True)
+                    st.markdown('<div class="metric"><div class="metric-number">80h</div><div class="metric-label">Manual effort avoided</div></div>', unsafe_allow_html=True)
                 with m2:
-                    st.markdown('<div class="metric-box"><div class="metric-number">1</div><div class="metric-label">Controlled workflow</div></div>', unsafe_allow_html=True)
+                    st.markdown('<div class="metric"><div class="metric-number">1</div><div class="metric-label">Controlled workflow</div></div>', unsafe_allow_html=True)
                 with m3:
-                    st.markdown('<div class="metric-box"><div class="metric-number">Seconds</div><div class="metric-label">To structured output</div></div>', unsafe_allow_html=True)
-                st.markdown('<div class="subtle-note">This demo shows how Midnight converts a legacy policy into a structured, audit-ready document instead of forcing manual rework during audit preparation.</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="metric"><div class="metric-number">Seconds</div><div class="metric-label">To structured output</div></div>', unsafe_allow_html=True)
+                st.markdown('<div class="soft-box">This demo shows how Midnight converts a legacy policy into a structured, audit-ready document instead of forcing manual rework during audit preparation.</div>', unsafe_allow_html=True)
                 if st.button("Run Demo", key="run_demo"):
                     st.session_state["demo_policy_data"] = run_llm_transform(
                         DEMO_SOURCE_TEXT,
@@ -1068,18 +973,16 @@ else:
 
             st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
-            demo_left, demo_right = st.columns([0.5, 0.5], gap="medium")
+            before_col, after_col = st.columns(2, gap="medium")
 
-            with demo_left:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            with before_col:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Before")
-                st.markdown('<div class="preview-box">', unsafe_allow_html=True)
                 st.code(DEMO_SOURCE_TEXT, language="text")
                 st.markdown("</div>", unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
 
-            with demo_right:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            with after_col:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### After")
                 if st.session_state["demo_policy_data"]:
                     render_policy_preview(st.session_state["demo_policy_data"])
@@ -1110,42 +1013,39 @@ else:
                         )
 
         elif st.session_state["active_mode"] == "Migrate Policy":
-            st.markdown('<div class="pane-header">', unsafe_allow_html=True)
-            st.markdown('<div class="pane-title">Migrate Policy</div>', unsafe_allow_html=True)
+            st.markdown('<div class="panel">', unsafe_allow_html=True)
+            st.markdown("### Migrate Policy")
             st.markdown(
-                f'<div class="pane-subtitle">Convert an existing document into the selected template · {st.session_state["selected_template"]}</div>',
+                f'<div class="section-copy">Convert an existing document into the selected template · {st.session_state["selected_template"]}</div>',
                 unsafe_allow_html=True,
             )
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-            content_left, content_right = st.columns([1.02, 0.98], gap="medium")
+            st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
-            with content_left:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            migrate_left, migrate_right = st.columns([1.02, 0.98], gap="medium")
+
+            with migrate_left:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Upload")
-                st.markdown(
-                    '<div class="caption-text">Supported formats: .docx, .txt, .md</div>',
-                    unsafe_allow_html=True,
-                )
-
+                st.markdown('<div class="caption">Supported formats: .docx, .txt, .md</div>', unsafe_allow_html=True)
                 uploaded_file = st.file_uploader(
                     "Upload a legacy policy document",
                     type=["docx", "txt", "md"],
                     label_visibility="collapsed",
                     key="migrate_upload",
                 )
-
                 run_migration = st.button("Transform Policy", key="run_migration")
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
-            with content_right:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+            with migrate_right:
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Preview")
                 if "migration_policy_data" in st.session_state:
                     render_policy_preview(st.session_state["migration_policy_data"])
                 else:
                     st.info("Run a migration to preview the extracted policy before generating the final document.")
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
             if run_migration:
                 if not uploaded_file:
@@ -1153,7 +1053,6 @@ else:
                     st.stop()
 
                 doc_text = get_uploaded_text(uploaded_file)
-
                 if len(doc_text.strip()) < 50:
                     st.error("Document appears to be empty or too short.")
                     st.stop()
@@ -1186,118 +1085,113 @@ else:
                         )
 
         else:
-            st.markdown('<div class="pane-header">', unsafe_allow_html=True)
-            st.markdown('<div class="pane-title">Create Policy</div>', unsafe_allow_html=True)
+            st.markdown('<div class="panel">', unsafe_allow_html=True)
+            st.markdown("### Create Policy")
             st.markdown(
-                f'<div class="pane-subtitle">Generate a new document from structured intake · {st.session_state["selected_template"]}</div>',
+                f'<div class="section-copy">Generate a new document from structured intake · {st.session_state["selected_template"]}</div>',
                 unsafe_allow_html=True,
             )
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
             form_col, preview_col = st.columns([1.02, 0.98], gap="medium")
 
             with form_col:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Intake")
 
                 with st.form("create_policy_form"):
-                    policy_name = st.text_input("Policy Name")
-                    meta1, meta2, meta3 = st.columns(3)
-                    with meta1:
-                        policy_number = st.text_input("Policy Number")
-                    with meta2:
-                        version = st.text_input("Version", value="V1.0")
-                    with meta3:
-                        grc_id = st.text_input("GRC ID")
+                    policy_name = st.text_input("Policy Name", value="Mobile Integration")
+                    policy_number = st.text_input("Policy Number", value="PE-1")
+                    version = st.text_input("Version", value="V1.0")
+                    grc_id = st.text_input("GRC ID", value="")
 
-                    meta4, meta5, meta6 = st.columns(3)
-                    with meta4:
-                        effective_date = st.text_input("Effective Date")
-                    with meta5:
-                        last_reviewed = st.text_input("Last Reviewed")
-                    with meta6:
-                        last_revised = st.text_input("Last Revised")
+                    effective_date = st.text_input("Effective Date", value="4/1/2026")
+                    last_reviewed = st.text_input("Last Reviewed", value="")
+                    last_revised = st.text_input("Last Revised", value="")
+                    supersedes = st.text_input("Supersedes", value="")
+                    custodians = st.text_input("Custodians", value="")
 
-                    supersedes = st.text_input("Supersedes")
-                    custodians = st.text_input("Custodians")
+                    owner_name = st.text_input("Owner Name", value="Brian Word")
+                    owner_title = st.text_input("Owner Title", value="CIO")
+                    approver_name = st.text_input("Approver Name", value="Kim W")
+                    approver_title = st.text_input("Approver Title", value="CEO")
 
-                    owner1, owner2 = st.columns(2)
-                    with owner1:
-                        owner_name = st.text_input("Owner Name")
-                    with owner2:
-                        owner_title = st.text_input("Owner Title")
+                    date_signed = st.text_input("Date Signed", value="")
+                    date_approved = st.text_input("Date Approved", value="")
 
-                    approver1, approver2 = st.columns(2)
-                    with approver1:
-                        approver_name = st.text_input("Approver Name")
-                    with approver2:
-                        approver_title = st.text_input("Approver Title")
-
-                    signed1, signed2 = st.columns(2)
-                    with signed1:
-                        date_signed = st.text_input("Date Signed")
-                    with signed2:
-                        date_approved = st.text_input("Date Approved")
-
-                    purpose = st.text_area("Purpose", height=120)
-                    definitions_text = st.text_area(
-                        "Definitions (one per line, format: Term: Definition)",
-                        height=120,
-                    )
-                    policy_statement = st.text_area("Policy Statement", height=140)
-                    procedures_text = st.text_area(
-                        "Procedures (one line per step; use '- ' for bullets)",
-                        height=220,
-                    )
-                    related_policies_text = st.text_area(
-                        "Related Policies (one per line)",
-                        height=100,
-                    )
-                    citations_text = st.text_area(
-                        "Citations / References (one per line)",
-                        height=100,
-                    )
+                    purpose = st.text_area("Purpose", value="To define the scope of proof of concept", height=120)
+                    definitions_text = st.text_area("Definitions (one per line, format: Term: Definition)", value="", height=120)
+                    policy_statement = st.text_area("Policy Statement", value="This is a declaration", height=140)
+                    procedures_text = st.text_area("Procedures (one line per step; use '- ' for bullets)", value="Establish a policy that provides audit evidence", height=220)
+                    related_policies_text = st.text_area("Related Policies (one per line)", value="", height=100)
+                    citations_text = st.text_area("Citations / References (one per line)", value="", height=100)
 
                     create_preview = st.form_submit_button("Build Preview")
 
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+                preview_defaults = {
+                    "last_reviewed": normalize_date_input(default_if_blank(last_reviewed, effective_date)),
+                    "last_revised": normalize_date_input(default_if_blank(last_revised, effective_date)),
+                    "date_signed": normalize_date_input(default_if_blank(date_signed, effective_date)),
+                    "date_approved": normalize_date_input(default_if_blank(date_approved, default_if_blank(date_signed, effective_date))),
+                }
+
+                st.markdown(
+                    f'<div class="soft-box"><strong>Smart defaults:</strong> Last Reviewed = {preview_defaults["last_reviewed"] or "—"} · Last Revised = {preview_defaults["last_revised"] or "—"} · Date Signed = {preview_defaults["date_signed"] or "—"} · Date Approved = {preview_defaults["date_approved"] or "—"}</div>',
+                    unsafe_allow_html=True,
+                )
 
                 if create_preview:
-                    created_policy_data = build_creation_policy_data(
-                        policy_name,
-                        policy_number,
-                        version,
-                        grc_id,
-                        supersedes,
+                    date_errors = validate_dates(
                         effective_date,
-                        last_reviewed,
-                        last_revised,
-                        custodians,
-                        owner_name,
-                        owner_title,
-                        approver_name,
-                        approver_title,
-                        date_signed,
-                        date_approved,
-                        purpose,
-                        definitions_text,
-                        policy_statement,
-                        procedures_text,
-                        related_policies_text,
-                        citations_text,
-                        st.session_state["selected_template"],
+                        preview_defaults["last_reviewed"],
+                        preview_defaults["last_revised"],
+                        preview_defaults["date_signed"],
+                        preview_defaults["date_approved"],
                     )
-                    st.session_state["created_policy_data"] = created_policy_data
-                    st.success("Preview ready.")
+
+                    if date_errors:
+                        for err in date_errors:
+                            st.error(err)
+                    else:
+                        created_policy_data = build_creation_policy_data(
+                            policy_name,
+                            policy_number,
+                            version,
+                            grc_id,
+                            supersedes,
+                            effective_date,
+                            last_reviewed,
+                            last_revised,
+                            custodians,
+                            owner_name,
+                            owner_title,
+                            approver_name,
+                            approver_title,
+                            date_signed,
+                            date_approved,
+                            purpose,
+                            definitions_text,
+                            policy_statement,
+                            procedures_text,
+                            related_policies_text,
+                            citations_text,
+                            st.session_state["selected_template"],
+                        )
+                        st.session_state["created_policy_data"] = created_policy_data
+                        st.success("Preview ready.")
 
             with preview_col:
-                st.markdown('<div class="panel-card">', unsafe_allow_html=True)
+                st.markdown('<div class="panel">', unsafe_allow_html=True)
                 st.markdown("### Preview")
                 if "created_policy_data" in st.session_state:
                     render_policy_preview(st.session_state["created_policy_data"])
                 else:
                     st.info("Complete the intake form and build a preview to review the policy before generating the final document.")
-                st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
             if "created_policy_data" in st.session_state:
                 st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
@@ -1320,7 +1214,3 @@ else:
                             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             key="download_created_doc",
                         )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
