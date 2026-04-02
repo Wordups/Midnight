@@ -102,52 +102,113 @@ st.set_page_config(
 )
 
 # =========================================================
+# STATE
+# =========================================================
+if "page" not in st.session_state:
+    st.session_state["page"] = "Overview"
+
+if "selected_template" not in st.session_state:
+    st.session_state["selected_template"] = TEMPLATE_OPTIONS[0]
+
+if "migration_policy_data" not in st.session_state:
+    st.session_state["migration_policy_data"] = None
+
+if "created_policy_data" not in st.session_state:
+    st.session_state["created_policy_data"] = None
+
+# =========================================================
 # STYLING
 # =========================================================
 st.markdown(
     """
     <style>
         :root {
-            --bg-dark: #070707;
-            --bg-dark-soft: #111111;
-            --bg-page: #f4f4f6;
-            --surface: #ffffff;
-            --surface-soft: #f7f7f8;
-            --text-light: #f5f5f7;
-            --text-dark: #111111;
-            --text-muted: #6e6e73;
-            --text-muted-dark: rgba(255,255,255,0.72);
-            --line: rgba(0,0,0,0.08);
-            --line-soft: rgba(0,0,0,0.05);
-            --accent: #ff5b2e;
-            --accent-2: #00c2ff;
+            --bg-1: #05070c;
+            --bg-2: #0b1020;
+            --bg-3: #111827;
+            --surface: rgba(14, 20, 33, 0.78);
+            --surface-soft: rgba(255,255,255,0.04);
+            --surface-light: rgba(255,255,255,0.06);
+            --line: rgba(255,255,255,0.08);
+            --line-strong: rgba(255,255,255,0.14);
+            --text: #f5f7fa;
+            --text-muted: #a6b0be;
+            --text-dim: #7d8796;
+            --accent: #00b7ff;
+            --accent-2: #2563eb;
+            --accent-warm: #ff5b2e;
+            --success: #1ed760;
+        }
+
+        html, body, [class*="css"] {
+            background: transparent !important;
         }
 
         .stApp {
-            background: var(--bg-page);
-            color: var(--text-dark);
+            background:
+                radial-gradient(circle at 78% 16%, rgba(255,91,46,0.18), transparent 18%),
+                radial-gradient(circle at 62% 18%, rgba(0,183,255,0.16), transparent 16%),
+                linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-3) 100%);
+            color: var(--text);
         }
 
         .block-container {
             max-width: 1280px;
-            padding-top: 0.8rem;
+            padding-top: 0.9rem;
             padding-bottom: 2rem;
+            background: transparent !important;
         }
 
         header {visibility: hidden;}
 
-        /* ---------- Top Nav ---------- */
+        div[data-testid="stVerticalBlock"] > div {
+            background: transparent !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.7s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.75s ease-out;
+        }
+
+        .slide-left {
+            animation: slideLeft 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideLeft {
+            from { opacity: 0; transform: translateX(22px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ---------- Nav ---------- */
+        .topnav-shell {
+            animation: fadeIn 0.6s ease-out;
+        }
+
         .topnav {
-            background: rgba(255,255,255,0.78);
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(10, 14, 24, 0.72);
+            border: 1px solid var(--line);
             border-radius: 18px;
             padding: 1rem 1.2rem;
             margin-bottom: 1rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+            backdrop-filter: blur(14px);
         }
 
         .brand-eyebrow {
-            color: #8e8e93;
+            color: rgba(255,255,255,0.55);
             font-size: 0.72rem;
             letter-spacing: 0.24em;
             text-transform: uppercase;
@@ -159,7 +220,7 @@ st.markdown(
             font-weight: 700;
             letter-spacing: 0.05em;
             margin-bottom: 0.08rem;
-            color: var(--text-dark);
+            color: var(--text);
         }
 
         .brand-subtitle {
@@ -168,154 +229,177 @@ st.markdown(
         }
 
         div[data-testid="stRadio"] > div {
-            gap: 0.4rem;
+            gap: 0.45rem;
         }
 
         div[data-testid="stRadio"] label {
             background: transparent !important;
             border: 1px solid transparent !important;
             border-radius: 14px !important;
-            padding: 0.62rem 0.9rem !important;
+            padding: 0.62rem 0.92rem !important;
+            transition: all .18s ease;
         }
 
         div[data-testid="stRadio"] label:hover {
-            background: rgba(0,0,0,0.03) !important;
+            background: rgba(255,255,255,0.04) !important;
         }
 
         div[data-testid="stRadio"] label p {
-            color: #1f1f22 !important;
+            color: var(--text-muted) !important;
             font-weight: 600 !important;
         }
 
         div[data-testid="stRadio"] label:has(input:checked) {
-            background: #ffffff !important;
-            border: 1px solid rgba(0,0,0,0.08) !important;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+            background: rgba(255,255,255,0.07) !important;
+            border: 1px solid var(--line-strong) !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
         }
 
         div[data-testid="stRadio"] label:has(input:checked) p {
-            color: #111111 !important;
+            color: #ffffff !important;
         }
 
-        /* ---------- Dark Hero ---------- */
+        /* ---------- Hero ---------- */
+        .hero-wrap {
+            animation: slideUp 0.8s ease-out;
+        }
+
         .hero-dark {
             position: relative;
             overflow: hidden;
             border-radius: 28px;
-            padding: 3.2rem 2.4rem;
+            padding: 3.4rem 2.4rem;
             background:
-                radial-gradient(circle at 80% 20%, rgba(255,91,46,0.25), transparent 28%),
-                radial-gradient(circle at 62% 35%, rgba(0,194,255,0.18), transparent 22%),
-                linear-gradient(135deg, #070707 0%, #111111 50%, #1a110d 100%);
-            color: var(--text-light);
-            box-shadow: 0 18px 42px rgba(0,0,0,0.18);
+                radial-gradient(circle at 82% 24%, rgba(255,91,46,0.22), transparent 20%),
+                radial-gradient(circle at 64% 18%, rgba(0,183,255,0.20), transparent 16%),
+                linear-gradient(135deg, #06080d 0%, #0b1120 46%, #140d0b 100%);
+            color: var(--text);
+            box-shadow: 0 18px 42px rgba(0,0,0,0.26);
+            border: 1px solid var(--line);
             margin-bottom: 1rem;
         }
 
         .hero-grid {
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
+            grid-template-columns: 1.18fr 0.82fr;
             gap: 2rem;
             align-items: center;
         }
 
         .hero-label {
-            color: rgba(255,255,255,0.68);
+            color: rgba(255,255,255,0.64);
             font-size: 0.76rem;
             letter-spacing: 0.28em;
             text-transform: uppercase;
             margin-bottom: 1rem;
+            animation: fadeIn 1s ease-out;
         }
 
         .hero-title {
-            font-size: 4rem;
+            font-size: 4.15rem;
             font-weight: 700;
             line-height: 0.96;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.01em;
             margin-bottom: 1rem;
+            animation: slideUp 0.9s ease-out;
         }
 
         .hero-title .accent {
             color: var(--accent);
         }
 
+        .hero-title .accent-warm {
+            color: var(--accent-warm);
+        }
+
         .hero-copy {
-            color: var(--text-muted-dark);
+            color: rgba(255,255,255,0.78);
             font-size: 1.08rem;
-            line-height: 1.72;
+            line-height: 1.75;
             max-width: 760px;
             margin-bottom: 1.2rem;
+            animation: fadeIn 1.05s ease-out;
         }
 
         .hero-pill-row {
             display: flex;
             gap: 0.55rem;
             flex-wrap: wrap;
-            margin-bottom: 1.4rem;
+            margin-bottom: 1.35rem;
+            animation: fadeIn 1.1s ease-out;
         }
 
         .hero-pill {
             display: inline-block;
             padding: 0.42rem 0.8rem;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.12);
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.78);
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.82);
             font-size: 0.78rem;
         }
 
-        .hero-cta-note {
-            color: rgba(255,255,255,0.55);
-            font-size: 0.84rem;
-            margin-top: 0.8rem;
-        }
-
-        .hero-side {
-            min-height: 300px;
+        .hero-visual {
+            min-height: 320px;
             border-radius: 24px;
-            background:
-                linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
-                radial-gradient(circle at 20% 20%, rgba(0,194,255,0.16), transparent 22%),
-                radial-gradient(circle at 78% 32%, rgba(255,91,46,0.18), transparent 18%),
-                linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-            border: 1px solid rgba(255,255,255,0.08);
             position: relative;
             overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+                radial-gradient(circle at 24% 24%, rgba(0,183,255,0.16), transparent 18%),
+                radial-gradient(circle at 78% 28%, rgba(255,91,46,0.18), transparent 18%),
+                linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.09);
+            animation: slideLeft 0.95s ease-out;
         }
 
-        .hero-side::before {
+        .hero-visual::before {
             content: "";
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(120deg, transparent 0%, transparent 38%, rgba(255,255,255,0.06) 39%, transparent 42%),
+                linear-gradient(120deg, transparent 0%, transparent 34%, rgba(255,255,255,0.08) 35%, transparent 38%),
                 repeating-linear-gradient(
                     135deg,
-                    rgba(255,91,46,0.22) 0px,
-                    rgba(255,91,46,0.22) 3px,
+                    rgba(255,91,46,0.24) 0px,
+                    rgba(255,91,46,0.24) 3px,
                     transparent 3px,
                     transparent 14px
                 );
-            opacity: 0.55;
+            opacity: 0.56;
         }
 
-        .hero-side-inner {
+        .hero-visual-glow {
+            position: absolute;
+            inset: auto 12% 10% 12%;
+            height: 64px;
+            background: radial-gradient(circle, rgba(0,183,255,0.45), transparent 60%);
+            filter: blur(14px);
+            animation: pulseGlow 3.2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.55; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.06); }
+        }
+
+        .hero-visual-inner {
             position: absolute;
             left: 2rem;
-            bottom: 2rem;
             right: 2rem;
+            bottom: 2rem;
             z-index: 2;
         }
 
-        .hero-side-kicker {
-            color: rgba(255,255,255,0.56);
+        .hero-visual-kicker {
+            color: rgba(255,255,255,0.58);
             font-size: 0.78rem;
             letter-spacing: 0.24em;
             text-transform: uppercase;
             margin-bottom: 0.7rem;
         }
 
-        .hero-side-title {
+        .hero-visual-title {
             color: #ffffff;
             font-size: 2rem;
             line-height: 1.05;
@@ -323,31 +407,32 @@ st.markdown(
             margin-bottom: 0.7rem;
         }
 
-        .hero-side-copy {
-            color: rgba(255,255,255,0.72);
+        .hero-visual-copy {
+            color: rgba(255,255,255,0.74);
             font-size: 0.94rem;
             line-height: 1.62;
         }
 
-        /* ---------- Overview Content ---------- */
+        /* ---------- Overview Sections ---------- */
         .section-surface {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(14,20,33,0.72);
+            border: 1px solid var(--line);
             border-radius: 22px;
             padding: 1.2rem;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.03);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.14);
             height: 100%;
+            backdrop-filter: blur(12px);
         }
 
         .section-title {
             font-size: 1.45rem;
             font-weight: 700;
-            color: #111111;
+            color: #ffffff;
             margin-bottom: 0.35rem;
         }
 
         .section-copy {
-            color: #6e6e73;
+            color: var(--text-muted);
             font-size: 0.94rem;
             line-height: 1.66;
         }
@@ -355,35 +440,38 @@ st.markdown(
         .feature-title {
             font-size: 1.08rem;
             font-weight: 700;
-            color: #111111;
+            color: #ffffff;
             margin-bottom: 0.35rem;
         }
 
         .feature-copy {
-            color: #6e6e73;
+            color: var(--text-muted);
             font-size: 0.92rem;
             line-height: 1.62;
         }
 
         .dark-band {
-            background: linear-gradient(135deg, #0a0a0a 0%, #140807 100%);
+            background:
+                radial-gradient(circle at 80% 20%, rgba(255,91,46,0.12), transparent 22%),
+                linear-gradient(135deg, rgba(8,8,10,0.94) 0%, rgba(17,10,10,0.94) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
             border-radius: 24px;
-            padding: 1.4rem;
-            color: white;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+            padding: 1.5rem;
+            color: #ffffff;
+            box-shadow: 0 16px 30px rgba(0,0,0,0.18);
         }
 
         .dark-band-title {
             color: #ffffff;
-            font-size: 1.8rem;
+            font-size: 1.85rem;
             font-weight: 700;
             margin-bottom: 0.8rem;
         }
 
         .dark-band-copy {
-            color: rgba(255,255,255,0.75);
+            color: rgba(255,255,255,0.76);
             font-size: 0.98rem;
-            line-height: 1.7;
+            line-height: 1.72;
         }
 
         .stat-row {
@@ -402,7 +490,7 @@ st.markdown(
         }
 
         .stat-number {
-            font-size: 1.9rem;
+            font-size: 1.95rem;
             font-weight: 700;
             color: var(--accent);
             margin-bottom: 0.25rem;
@@ -416,72 +504,76 @@ st.markdown(
         /* ---------- Workspace ---------- */
         .workspace-header {
             margin-bottom: 1rem;
+            animation: fadeIn 0.7s ease-out;
         }
 
         .workspace-title {
             font-size: 1.9rem;
             font-weight: 700;
-            color: #111111;
+            color: #ffffff;
             margin-bottom: 0.22rem;
         }
 
         .workspace-subtitle {
-            color: #6e6e73;
+            color: var(--text-muted);
             font-size: 0.95rem;
         }
 
         .panel {
-            background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.06);
+            background: var(--surface);
+            border: 1px solid var(--line);
             border-radius: 20px;
             padding: 1rem;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.14);
             height: 100%;
+            backdrop-filter: blur(12px);
+            animation: slideUp 0.7s ease-out;
         }
 
         .panel-title {
             font-size: 1.35rem;
             font-weight: 700;
-            color: #111111;
+            color: #ffffff;
             margin-bottom: 0.25rem;
         }
 
         .panel-copy {
-            color: #6e6e73;
+            color: var(--text-muted);
             font-size: 0.92rem;
             line-height: 1.6;
             margin-bottom: 0.8rem;
         }
 
         .soft-box {
-            background: #f7f7f8;
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 16px;
             padding: 0.95rem 1rem;
-            color: #4b4b50;
+            color: #c1c8d2;
             font-size: 0.9rem;
             line-height: 1.62;
         }
 
         .preview-box {
-            background: #f8f8fa;
-            border: 1px solid rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
             border-radius: 16px;
             padding: 1rem;
+            color: #ffffff;
         }
 
         .caption {
-            color: #8e8e93;
+            color: var(--text-dim);
             font-size: 0.8rem;
             margin-bottom: 0.65rem;
         }
 
         .success-box {
-            background: #eefaf1;
-            border: 1px solid #cfead7;
+            background: rgba(30,215,96,0.10);
+            border: 1px solid rgba(30,215,96,0.28);
             border-radius: 14px;
             padding: 0.85rem 1rem;
-            color: #1d7a3b;
+            color: #95f1b2;
             text-align: center;
             font-weight: 600;
             margin-top: 0.9rem;
@@ -494,13 +586,14 @@ st.markdown(
         /* ---------- Inputs ---------- */
         .stButton > button {
             width: 100% !important;
-            background: #111111 !important;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
             color: #ffffff !important;
             border: none !important;
             border-radius: 14px !important;
             padding: 0.92rem 1rem !important;
             font-weight: 600 !important;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.08) !important;
+            box-shadow: 0 10px 20px rgba(0,183,255,0.18) !important;
+            transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease !important;
         }
 
         .stButton > button p,
@@ -510,14 +603,16 @@ st.markdown(
         }
 
         .stButton > button:hover {
-            background: #000000 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(0,183,255,0.22) !important;
+            opacity: 0.96;
         }
 
         .stDownloadButton > button {
             width: 100% !important;
-            background: #f2f2f4 !important;
-            color: #111111 !important;
-            border: 1px solid rgba(0,0,0,0.12) !important;
+            background: rgba(255,255,255,0.06) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
             border-radius: 14px !important;
             padding: 0.92rem 1rem !important;
             font-weight: 600 !important;
@@ -526,32 +621,46 @@ st.markdown(
         .stTextInput input,
         .stTextArea textarea,
         .stSelectbox div[data-baseweb="select"] > div {
-            background: #ffffff !important;
-            color: #111111 !important;
-            border: 1px solid rgba(0,0,0,0.14) !important;
+            background: #0f1522 !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.12) !important;
             border-radius: 14px !important;
             box-shadow: none !important;
         }
 
         [data-testid="stWidgetLabel"] p {
-            color: #111111 !important;
+            color: #ffffff !important;
             font-weight: 600 !important;
         }
 
         input::placeholder,
         textarea::placeholder {
-            color: #8a8a8f !important;
+            color: #8a94a3 !important;
             opacity: 1 !important;
         }
 
         .stFileUploader > div {
-            background: #f7f7f8 !important;
-            border: 1px dashed rgba(0,0,0,0.15) !important;
+            background: #0f1522 !important;
+            border: 1px dashed rgba(255,255,255,0.14) !important;
             border-radius: 14px !important;
         }
 
         .stProgress > div > div {
-            background-color: #111111 !important;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        }
+
+        .stAlert {
+            background: rgba(255,255,255,0.05) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+        }
+
+        h1, h2, h3 {
+            color: #ffffff !important;
+        }
+
+        p, span, label {
+            color: var(--text-muted);
         }
 
         @media (max-width: 900px) {
@@ -569,21 +678,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-# =========================================================
-# STATE
-# =========================================================
-if "page" not in st.session_state:
-    st.session_state["page"] = "Overview"
-
-if "selected_template" not in st.session_state:
-    st.session_state["selected_template"] = TEMPLATE_OPTIONS[0]
-
-if "migration_policy_data" not in st.session_state:
-    st.session_state["migration_policy_data"] = None
-
-if "created_policy_data" not in st.session_state:
-    st.session_state["created_policy_data"] = None
 
 # =========================================================
 # HELPERS
@@ -679,7 +773,6 @@ def validate_dates(effective_date, last_reviewed, last_revised, date_signed, dat
         errors.append("Last Revised cannot be earlier than Effective Date.")
     if signed and approved and approved < signed:
         errors.append("Date Approved cannot be earlier than Date Signed.")
-
     return errors
 
 
@@ -869,7 +962,7 @@ def run_llm_transform(source_text: str, template_name: str):
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": EXTRACTION_PROMPT + "\n\n" + source_text}],
+            messages=[{"role": "user", "content": EXTRACTION_PROMPT + "\\n\\n" + source_text}],
             temperature=0.1,
             max_tokens=8000,
         )
@@ -898,8 +991,9 @@ def run_llm_transform(source_text: str, template_name: str):
 
 
 # =========================================================
-# TOP NAV
+# NAV
 # =========================================================
+st.markdown('<div class="topnav-shell">', unsafe_allow_html=True)
 st.markdown('<div class="topnav">', unsafe_allow_html=True)
 nav_left, nav_right = st.columns([0.68, 0.32])
 
@@ -919,59 +1013,68 @@ with nav_right:
     )
     st.session_state["page"] = selected_page
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
 # OVERVIEW
 # =========================================================
 if st.session_state["page"] == "Overview":
+    st.markdown('<div class="hero-wrap">', unsafe_allow_html=True)
     st.markdown('<div class="hero-dark">', unsafe_allow_html=True)
     st.markdown('<div class="hero-grid">', unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div>
-            <div class="hero-label">Policy intelligence engine</div>
-            <div class="hero-title">Move policy work out of the <span class="accent">manual</span> era</div>
-            <div class="hero-copy">
-                Midnight helps teams migrate legacy policies, create new policies from structured intake,
-                and produce cleaner, more consistent documentation through a controlled workflow.
-            </div>
-            <div class="hero-pill-row">
-                <span class="hero-pill">Reduce audit prep time</span>
-                <span class="hero-pill">Standardize document structure</span>
-                <span class="hero-pill">Generate controlled output</span>
-                <span class="hero-pill">Support repeatable policy operations</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container():
+        hero_left, hero_right = st.columns([1.18, 0.82])
 
-    hero_btn_left, hero_btn_right = st.columns([0.22, 0.22])
-    with hero_btn_left:
-        if st.button("Migrate a Policy", key="hero_migrate"):
-            st.session_state["page"] = "Migrate a Policy"
-            st.rerun()
-    with hero_btn_right:
-        if st.button("Create a Policy", key="hero_create"):
-            st.session_state["page"] = "Create a Policy"
-            st.rerun()
-
-    st.markdown(
-        """
-        <div class="hero-side">
-            <div class="hero-side-inner">
-                <div class="hero-side-kicker">Built for controlled documentation</div>
-                <div class="hero-side-title">One engine. Two core workflows.</div>
-                <div class="hero-side-copy">
-                    Use Midnight to transform existing policy documents or generate new ones from a structured intake process.
+        with hero_left:
+            st.markdown('<div class="hero-label">Policy intelligence engine</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="hero-title">Move policy work out of the <span class="accent-warm">manual</span> era</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="hero-copy">Midnight helps teams migrate legacy policies, create new policies from structured intake, and produce cleaner, more consistent documentation through a controlled workflow.</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                """
+                <div class="hero-pill-row">
+                    <span class="hero-pill">Reduce audit prep time</span>
+                    <span class="hero-pill">Standardize document structure</span>
+                    <span class="hero-pill">Generate controlled output</span>
+                    <span class="hero-pill">Support repeatable policy operations</span>
                 </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+                """,
+                unsafe_allow_html=True,
+            )
+
+            cta1, cta2 = st.columns([0.28, 0.28])
+            with cta1:
+                if st.button("Migrate a Policy", key="hero_migrate"):
+                    st.session_state["page"] = "Migrate a Policy"
+                    st.rerun()
+            with cta2:
+                if st.button("Create a Policy", key="hero_create"):
+                    st.session_state["page"] = "Create a Policy"
+                    st.rerun()
+
+        with hero_right:
+            st.markdown(
+                """
+                <div class="hero-visual">
+                    <div class="hero-visual-glow"></div>
+                    <div class="hero-visual-inner">
+                        <div class="hero-visual-kicker">Controlled documentation workflow</div>
+                        <div class="hero-visual-title">One engine. Two core workflows.</div>
+                        <div class="hero-visual-copy">
+                            Use Midnight to transform existing policy documents or generate new ones from a structured intake process.
+                        </div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -980,19 +1083,19 @@ if st.session_state["page"] == "Overview":
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown('<div class="section-surface">', unsafe_allow_html=True)
+        st.markdown('<div class="section-surface slide-up">', unsafe_allow_html=True)
         st.markdown('<div class="feature-title">Migrate Policy</div>', unsafe_allow_html=True)
         st.markdown('<div class="feature-copy">Upload an existing document and convert it into the selected template without manual copy-and-paste reconstruction.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with c2:
-        st.markdown('<div class="section-surface">', unsafe_allow_html=True)
+        st.markdown('<div class="section-surface slide-up">', unsafe_allow_html=True)
         st.markdown('<div class="feature-title">Create Policy</div>', unsafe_allow_html=True)
         st.markdown('<div class="feature-copy">Build a new policy from structured intake with smart defaults, preview, and controlled final document generation.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with c3:
-        st.markdown('<div class="section-surface">', unsafe_allow_html=True)
+        st.markdown('<div class="section-surface slide-up">', unsafe_allow_html=True)
         st.markdown('<div class="feature-title">How it works</div>', unsafe_allow_html=True)
         st.markdown('<div class="feature-copy">Select a template, upload or enter content, review the preview, then generate a standardized final document.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1000,8 +1103,9 @@ if st.session_state["page"] == "Overview":
     st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
 
     bottom_left, bottom_right = st.columns([0.56, 0.44])
+
     with bottom_left:
-        st.markdown('<div class="dark-band">', unsafe_allow_html=True)
+        st.markdown('<div class="dark-band slide-up">', unsafe_allow_html=True)
         st.markdown('<div class="dark-band-title">A cleaner way to manage policy operations</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="dark-band-copy">Manual policy updates consume time, create inconsistency, and slow down audit readiness. Midnight is designed to reduce that burden and provide a more controlled path from source content to final document.</div>',
@@ -1025,7 +1129,7 @@ if st.session_state["page"] == "Overview":
         st.markdown('</div>', unsafe_allow_html=True)
 
     with bottom_right:
-        st.markdown('<div class="section-surface">', unsafe_allow_html=True)
+        st.markdown('<div class="section-surface slide-up">', unsafe_allow_html=True)
         st.markdown('<div class="section-title">What Midnight does</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="section-copy">Midnight is built to standardize policy creation and policy migration. It helps teams work faster, maintain cleaner structure, and reduce repetitive formatting effort when documentation needs to align to a template.</div>',
@@ -1038,10 +1142,10 @@ if st.session_state["page"] == "Overview":
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================
-# MIGRATE PAGE
+# MIGRATE
 # =========================================================
 elif st.session_state["page"] == "Migrate a Policy":
-    st.markdown('<div class="workspace-header">', unsafe_allow_html=True)
+    st.markdown('<div class="workspace-header fade-in">', unsafe_allow_html=True)
     st.markdown('<div class="workspace-title">Migrate a Policy</div>', unsafe_allow_html=True)
     st.markdown('<div class="workspace-subtitle">Convert an existing document into a structured template.</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1106,6 +1210,7 @@ elif st.session_state["page"] == "Migrate a Policy":
         if policy_data:
             st.session_state["migration_policy_data"] = policy_data
             st.success("Preview ready. Review the output, then generate the final document.")
+            st.rerun()
 
     if st.session_state["migration_policy_data"]:
         st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
@@ -1130,10 +1235,10 @@ elif st.session_state["page"] == "Migrate a Policy":
                 )
 
 # =========================================================
-# CREATE PAGE
+# CREATE
 # =========================================================
 else:
-    st.markdown('<div class="workspace-header">', unsafe_allow_html=True)
+    st.markdown('<div class="workspace-header fade-in">', unsafe_allow_html=True)
     st.markdown('<div class="workspace-title">Create a Policy</div>', unsafe_allow_html=True)
     st.markdown('<div class="workspace-subtitle">Generate a new policy from structured intake.</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -1164,8 +1269,8 @@ else:
         st.markdown('<div class="panel-title">Intake</div>', unsafe_allow_html=True)
 
         with st.form("create_policy_form"):
-            policy_name = st.text_input("Policy Name", value="Mobile Integration")
-            policy_number = st.text_input("Policy Number", value="PE-1")
+            policy_name = st.text_input("Policy Name", value="")
+            policy_number = st.text_input("Policy Number", value="")
             version = st.text_input("Version", value="V1.0")
             grc_id = st.text_input("GRC ID", value="")
 
@@ -1269,6 +1374,7 @@ else:
             )
             st.session_state["created_policy_data"] = created_policy_data
             st.success("Preview ready.")
+            st.rerun()
 
     if st.session_state["created_policy_data"]:
         st.markdown('<div class="divider-space"></div>', unsafe_allow_html=True)
