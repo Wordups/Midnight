@@ -7,6 +7,29 @@ import streamlit as st
 
 # --- Embedded builder code ---
 
+import os
+from rembg import remove
+
+os.makedirs("uploads", exist_ok=True)
+os.makedirs("assets", exist_ok=True)
+
+def make_transparent_logo(uploaded_file):
+    original_path = os.path.join("uploads", uploaded_file.name)
+
+    with open(original_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    output_path = os.path.join("assets", f"{uploaded_file.name}_transparent.png")
+
+    with open(original_path, "rb") as f:
+        input_bytes = f.read()
+
+    output_bytes = remove(input_bytes)
+
+    with open(output_path, "wb") as f:
+        f.write(output_bytes)
+
+    return output_path
 
 """
 ================================================================================
