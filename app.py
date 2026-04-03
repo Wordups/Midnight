@@ -1072,7 +1072,6 @@ st.markdown('<div class="topnav">', unsafe_allow_html=True)
 nav_left, nav_right = st.columns([0.68, 0.32])
 
 with nav_left:
-    st.markdown('<div class="brand-eyebrow">Takeoff Product</div>', unsafe_allow_html=True)
     st.markdown('<div class="brand-title">MIDNIGHT</div>', unsafe_allow_html=True)
     st.markdown('<div class="brand-subtitle">Policy Migration Engine</div>', unsafe_allow_html=True)
 
