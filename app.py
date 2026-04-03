@@ -703,6 +703,10 @@ def parse_policy_data(raw_output: str):
     else:
         dict_str = raw_output
 
+    # sanitize smart quotes before exec
+    dict_str = dict_str.replace("“", '"').replace("”", '"')
+    dict_str = dict_str.replace("’", "'")
+
     namespace = {}
     exec(dict_str, {}, namespace)
     return namespace.get("POLICY_DATA", None)
