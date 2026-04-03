@@ -6,7 +6,6 @@ import streamlit as st
 from groq import Groq
 from docx import Document
 from hps_policy_migration_builder import build_policy_document
-from rembg import remove
 
 
 # =========================================================
