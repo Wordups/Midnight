@@ -829,11 +829,15 @@ if st.session_state["page"] == "Overview":
     cta1, cta2, _sp = st.columns([0.18, 0.18, 0.64])
     with cta1:
         if st.button("Migrate a Policy", key="ov_migrate"):
-            st.session_state["page"] = "Migrate a Policy"
+            st.session_state["page"]    = "Migrate a Policy"
+            st.session_state["top_nav"] = "Migrate a Policy"
+            st.session_state["top_nav"] = "Migrate a Policy"
             st.rerun()
     with cta2:
         if st.button("Create a Policy", key="ov_create"):
-            st.session_state["page"] = "Create a Policy"
+            st.session_state["page"]    = "Create a Policy"
+            st.session_state["top_nav"] = "Create a Policy"
+            st.session_state["top_nav"] = "Create a Policy"
             st.rerun()
 
     st.markdown('<div class="gap"></div>', unsafe_allow_html=True)
